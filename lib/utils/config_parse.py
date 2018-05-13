@@ -81,6 +81,9 @@ __C.MODEL.CLIP = True
 # FSSD setting, NUM_FUSED for fssd
 __C.MODEL.NUM_FUSED = 3
 
+# Activation Setting
+__C.MODEL.ACTIVATION = 'relu'
+
 
 # ---------------------------------------------------------------------------- #
 # Train options
@@ -128,6 +131,9 @@ __C.TRAIN.LR_SCHEDULER.GAMMA = 0.98
 __C.TRAIN.LR_SCHEDULER.WARM_UP_EPOCHS = 0
 # The number of max iters
 __C.TRAIN.LR_SCHEDULER.MAX_EPOCHS = __C.TRAIN.MAX_EPOCHS - __C.TRAIN.LR_SCHEDULER.WARM_UP_EPOCHS
+
+##########################
+__C.TRAIN.LR_SCHEDULER.WR_TI = 70
 
 # ---------------------------------------------------------------------------- #
 # Test options

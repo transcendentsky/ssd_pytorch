@@ -16,4 +16,5 @@ experiments/pre_test/*
 .idea
 .idea/
 pictest.py
-
+*.sh
+*.xlsx*

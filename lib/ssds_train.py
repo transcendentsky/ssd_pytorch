@@ -253,6 +253,7 @@ class Solver(object):
 
     def test_model(self):
         previous = self.find_previous()
+        # print(previous)
         if previous:
             for epoch, resume_checkpoint in zip(previous[0], previous[1]):
                 if self.cfg.TEST.TEST_SCOPE[0] <= epoch <= self.cfg.TEST.TEST_SCOPE[1]:
@@ -260,6 +261,7 @@ class Solver(object):
                                                                                   max_epochs=self.cfg.TEST.TEST_SCOPE[
                                                                                       1]))
                     self.resume_checkpoint(resume_checkpoint)
+                    print(resume_checkpoint)
                     if 'eval' in cfg.PHASE:
                         self.eval_epoch(self.model, self.eval_loader, self.detector, self.criterion, self.writer, epoch,
                                         self.use_gpu)
@@ -274,9 +276,10 @@ class Solver(object):
             self.resume_checkpoint(self.checkpoint)
             if 'eval' in cfg.PHASE:
                 self.eval_epoch(self.model, self.eval_loader, self.detector, self.criterion, self.writer, 0,
-                                self.use_gpu)
+                                        self.use_gpu)
             if 'test' in cfg.PHASE:
-                self.test_epoch(self.model, self.test_loader, self.detector, self.output_dir, self.use_gpu)
+                self.test_epoch(self.model, self.test_loader, self.detector, self.output_dir, self.writer,
+                                        0, self.use_gpu)
             if 'visualize' in cfg.PHASE:
                 self.visualize_epoch(self.model, self.visualize_loader, self.priorbox, self.writer, 0, self.use_gpu)
 
@@ -699,6 +702,13 @@ class Solver(object):
             scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=cfg.GAMMA)
         elif cfg.SCHEDULER == 'SGDR':
             scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=cfg.MAX_EPOCHS)
+        elif cfg.SCHEDULER == 'WR':
+            try:
+                from utils.warm_restart import WarmRestart
+            except:
+                raise ImportError("Failed to import Warm_restart....")
+            scheduler = WarmRestart(optimizer, ti=cfg.WR_TI)
+
         else:
             AssertionError('scheduler can not be recognized.')
         return scheduler

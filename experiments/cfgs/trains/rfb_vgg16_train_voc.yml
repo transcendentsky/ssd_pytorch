@@ -9,9 +9,9 @@ MODEL:
   ASPECT_RATIOS: [[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2], [1, 2]]
 
 TRAIN:
-  MAX_EPOCHS: 100
-  CHECKPOINTS_EPOCHS: 1
-  BATCH_SIZE: 24
+  MAX_EPOCHS: 300
+  CHECKPOINTS_EPOCHS: 5
+  BATCH_SIZE: 32
   TRAINABLE_SCOPE: 'base,norm,extras,loc,conf'
   RESUME_SCOPE: 'base,norm,extras,loc,conf'
   OPTIMIZER:
@@ -39,12 +39,13 @@ POST_PROCESS:
 
 DATASET:
   DATASET: 'voc'
-  DATASET_DIR: './data/VOCdevkit'
+  DATASET_DIR: './data/VOC/VOCdevkit'
   TRAIN_SETS: [['2007', 'trainval'], ['2012', 'trainval']]
   TEST_SETS:  [['2007', 'test']]
-  PROB: 0.6
 
 EXP_DIR: './experiments/models/rfb_vgg16_voc'
 LOG_DIR: './experiments/models/rfb_vgg16_voc'
-RESUME_CHECKPOINT: './weights/rfb/vgg16_rfb_voc_80.5.pth'
+RESUME_CHECKPOINT: './experiments/pre_test/vgg16_rfb_voc_79.6.pth'
 PHASE: ['test']
+
+TRAIN_MODE: ['mixup']

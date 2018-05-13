@@ -17,6 +17,8 @@ ssds_map = {
                 'fssd_lite': fssd_lite.build_fssd_lite,
                 'yolo_v2': yolo.build_yolo_v2,
                 'yolo_v3': yolo.build_yolo_v3,
+                'custom': None
+                # 'pelee': pelee.build_pelee,
             }
 
 # nets part
@@ -52,15 +54,16 @@ def _forward_features_size(model, img_size):
     feature_maps = model(x, phase='feature')
     return [(o.size()[2], o.size()[3]) for o in feature_maps]
 
-
+_DEBUG = False
 def create_model(cfg):
     '''
     '''
     #
     base = networks_map[cfg.NETS]
     number_box= [2*len(aspect_ratios) if isinstance(aspect_ratios[0], int) else len(aspect_ratios) for aspect_ratios in cfg.ASPECT_RATIOS]  
-        
-    model = ssds_map[cfg.SSDS](base=base, feature_layer=cfg.FEATURE_LAYER, mbox=number_box, num_classes=cfg.NUM_CLASSES)
+    if _DEBUG:
+        print("[DEBUG]: ", cfg.ASPECT_RATIOS)
+    model = ssds_map[cfg.SSDS](base=base, feature_layer=cfg.FEATURE_LAYER, mbox=number_box, num_classes=cfg.NUM_CLASSES, activation=cfg.ACTIVATION)
     #
     feature_maps = _forward_features_size(model, cfg.IMAGE_SIZE)
     print('==>Feature map size:')

@@ -338,11 +338,11 @@ def add_extras(base, feature_layer, mbox, num_classes, version):
         conf_layers += [nn.Conv2d(in_channels, box * num_classes, kernel_size=3, padding=1)]
     return base, extra_layers, norm_layers, (loc_layers, conf_layers)
 
-def build_rfb(base, feature_layer, mbox, num_classes):
+def build_rfb(base, feature_layer, mbox, num_classes, activation):
     """Receptive Field Block Net for Accurate and Fast Object Detection for embeded system
     See: https://arxiv.org/pdf/1711.07767.pdf for more details.
     """
-    base_, extras_, norm_, head_ = add_extras(base(), feature_layer, mbox, num_classes, version='rfb')
+    base_, extras_, norm_, head_ = add_extras(base(activation=activation), feature_layer, mbox, num_classes, version='rfb')
     return RFB(base_, extras_, norm_, head_, feature_layer, num_classes)
 
 def build_rfb_lite(base, feature_layer, mbox, num_classes):

@@ -9,14 +9,14 @@ MODEL:
   ASPECT_RATIOS: [[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2], [1, 2]]
 
 TRAIN:
-  MAX_EPOCHS: 200
+  MAX_EPOCHS: 300
   CHECKPOINTS_EPOCHS: 10
   BATCH_SIZE: 32
   TRAINABLE_SCOPE: 'base,norm,extras,loc,conf'
   RESUME_SCOPE: 'base,norm,extras,loc,conf'
   OPTIMIZER:
     OPTIMIZER: sgd
-    LEARNING_RATE: 0.005
+    LEARNING_RATE: 0.001
     MOMENTUM: 0.9
     WEIGHT_DECAY: 0.0001
   LR_SCHEDULER:
@@ -47,3 +47,6 @@ RESUME_CHECKPOINT: './experiments/pre_test/vgg16_ssd_voc_76.pth'
 PHASE: ['train']
 
 TRAIN_MODE: ['mixup']
+TEST_STEP: 10
+MODEL:
+  ACTIVATION: 'swish'

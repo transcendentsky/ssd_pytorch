@@ -210,7 +210,7 @@ class _router_v3(nn.Module):
 
 
 
-def build_yolo_v2(base, feature_layer, mbox, num_classes):
+def build_yolo_v2(base, feature_layer, mbox, num_classes, activation='relu'):
     base_, extras_, head_ = add_extras(base(), feature_layer, mbox, num_classes, version='v2')
     return YOLO(base_, extras_, head_, feature_layer, num_classes)
 

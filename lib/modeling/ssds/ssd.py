@@ -155,11 +155,11 @@ def _conv(inp, oup, stride=1, padding=0):
     )
 
 
-def build_ssd(base, feature_layer, mbox, num_classes):
+def build_ssd(base, feature_layer, mbox, num_classes, activation):
     """Single Shot Multibox Architecture
     See: https://arxiv.org/pdf/1512.02325.pdf for more details.
     """
-    base_, extras_, head_ = add_extras(base(), feature_layer, mbox, num_classes, version='ssd')
+    base_, extras_, head_ = add_extras(base(activation=activation), feature_layer, mbox, num_classes, version='ssd')
     return SSD(base_, extras_, head_, feature_layer, num_classes)
 
 def build_ssd_lite(base, feature_layer, mbox, num_classes):
