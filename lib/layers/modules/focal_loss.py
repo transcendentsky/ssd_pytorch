@@ -34,8 +34,8 @@ class FocalLoss(nn.Module):
         self.variance = cfg.VARIANCE
         self.priors = priors
 
-        self.alpha = Variable(torch.ones(self.num_classes, 1) * cfg.alpha)
-        self.gamma = cfg.gamma
+        self.alpha = Variable(torch.ones(self.num_classes, 1) * cfg.FL_ALPHA)
+        self.gamma = cfg.FL_GAMMA
 
 
     def forward(self, predictions, targets):
@@ -79,11 +79,11 @@ class FocalLoss(nn.Module):
         loc_p = loc_data[pos_idx].view(-1,4)
         loc_t = loc_t[pos_idx].view(-1,4)
         loss_l = F.smooth_l1_loss(loc_p, loc_t, size_average=False)
-        loss_l/=num_pos.data.sum()
+        N = num_pos.data.sum() + 1
+        loss_l/= N
 
-        # Confidence Loss (Focal loss)
-        # Shape: [batch,num_priors,1]
         loss_c = self.focal_loss(conf_data.view(-1, self.num_classes), conf_t.view(-1,1))
+        loss_c /= N
 
         return loss_l,loss_c
 
@@ -94,11 +94,16 @@ class FocalLoss(nn.Module):
         N = inputs.size(0)
         C = inputs.size(1)
         P = F.softmax(inputs)
-        
+
+        # print(targets.size())
         class_mask = inputs.data.new(N, C).fill_(0)
         class_mask = Variable(class_mask)
-        ids = targets.view(-1, 1)
-        class_mask.scatter_(1, ids.data, 1.)
+        ids = targets.view(-1,1)
+        _DEBUG = True
+        # print(ids.data.size())
+        # print(ids.data.sum())
+        # print("class_mask size(): ", class_mask.size())
+        class_mask.scatter_(1, ids, 1.0)
 
         if inputs.is_cuda and not self.alpha.is_cuda:
             self.alpha = self.alpha.cuda()
@@ -108,5 +113,28 @@ class FocalLoss(nn.Module):
 
         batch_loss = -alpha*(torch.pow((1-probs), self.gamma))*log_p 
 
-        loss = batch_loss.mean()
+        # loss = batch_loss.mean()
+        loss = batch_loss.sum()
         return loss
+
+    def focal_loss_alt(self, x, y):
+        '''Focal loss alternative.
+        Args:
+          x: (tensor) sized [N,D].
+          y: (tensor) sized [N,].
+        Return:
+          (tensor) focal loss.
+        '''
+        alpha = 0.25
+
+        t = one_hot_embedding(y.data.cpu(), 1 + self.num_classes)
+        t = t[:, 1:]
+        t = Variable(t).cuda()
+
+        xt = x * (2 * t - 1)  # xt = x if t > 0 else -x
+        pt = (2 * xt + 1).sigmoid()
+
+        w = alpha * t + (1 - alpha) * (1 - t)
+        loss = -w * pt.log() / 2
+
+        return loss.sum()

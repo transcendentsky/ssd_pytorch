@@ -15,7 +15,7 @@ TRAIN:
   RESUME_SCOPE: 'base,extras,loc,conf'
   OPTIMIZER:
     OPTIMIZER: sgd
-    LEARNING_RATE: 0.004
+    LEARNING_RATE: 0.001
     MOMENTUM: 0.9
     WEIGHT_DECAY: 0.0001
   LR_SCHEDULER:
@@ -26,7 +26,7 @@ TRAIN:
 
 TEST:
   BATCH_SIZE: 64
-  TEST_SCOPE: [90, 300]
+  TEST_SCOPE: [30, 300]
 
 MATCHER:
   MATCHED_THRESHOLD: 0.5
@@ -47,8 +47,8 @@ DATASET:
 
 EXP_DIR: './experiments/models/mixup/wr/yolo_v2_darknet_19_voc'
 LOG_DIR: './experiments/models/mixup/wr/yolo_v2_darknet_19_voc'
-RESUME_CHECKPOINT: './experiments/pre_test/darknet19_yolo_v2_voc_78.4.pth'
-PHASE: ['test']
+RESUME_CHECKPOINT: './experiments/models/mixup/yolo_v2_darknet_19_voc/yolo_v2_darknet19_voc_epoch_220.pth'
+PHASE: ['train','test']
 
 TRAIN_MODE: ['mixup']
-TEST_STEP: 10
+TEST_STEP: 1000

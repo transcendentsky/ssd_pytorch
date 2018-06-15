@@ -149,7 +149,11 @@ def voc_eval(detpath,
         # sort by confidence
     sorted_ind = np.argsort(-confidence)
     sorted_scores = np.sort(-confidence)
+
+    # print(BB.shape)
     BB = BB[sorted_ind, :]
+    # BB = BB[sorted_ind]
+
     image_ids = [image_ids[x] for x in sorted_ind]
 
         # go down dets and mark TPs and FPs

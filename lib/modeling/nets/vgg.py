@@ -48,7 +48,7 @@ def vgg(cfg, i, batch_norm=False, activation='relu'):
     if activation == 'relu':
         activ = nn.ReLU(inplace=True)
     elif activation == 'swish':
-        activ = Swish()
+        activ = Swish(inplace=True)
     elif activation == 'prelu':
         activ = nn.PReLU(inplace=True)
     layers = []

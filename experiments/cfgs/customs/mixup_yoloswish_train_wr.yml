@@ -1,6 +1,6 @@
 MODEL:
   SSDS: yolo_v2
-  NETS: darknet_19
+  NETS: darknet_19_swish
   IMAGE_SIZE: [416, 416]
   NUM_CLASSES: 21
   FEATURE_LAYER: [[['', '',12, '']], [[1024, 1024, 64, 1024]]]
@@ -8,26 +8,25 @@ MODEL:
   ASPECT_RATIOS: [[[0.1,0.1], [0.2,0.2], [0.3,0.3], [0.5,0.5], [0.9,0.9]]]
 
 TRAIN:
-  MAX_EPOCHS: 500
+  MAX_EPOCHS: 400
   CHECKPOINTS_EPOCHS: 10
-  BATCH_SIZE: 128 # 32
+  BATCH_SIZE: 32
   TRAINABLE_SCOPE: 'base,extras,loc,conf'
   RESUME_SCOPE: 'base,extras,loc,conf'
   OPTIMIZER:
     OPTIMIZER: sgd
-    LEARNING_RATE: 0.000018
+    LEARNING_RATE: 0.001
     MOMENTUM: 0.9
-#    MOMENTUM: 0
     WEIGHT_DECAY: 0.0001
   LR_SCHEDULER:
-#    SCHEDULER: SGDR
     SCHEDULER: WR
     WARM_UP_EPOCHS: 0
+    ####  warm_restart ti  ####
     WR_TI: 70
 
 TEST:
   BATCH_SIZE: 64
-  TEST_SCOPE: [301, 301]
+  TEST_SCOPE: [0, 300]
 
 MATCHER:
   MATCHED_THRESHOLD: 0.5
@@ -46,10 +45,14 @@ DATASET:
   TEST_SETS:  [['2007', 'test']]
   PROB: 0.6
 
-EXP_DIR: './experiments/models/mixup/yolo_v2_darknet_19_voc'
-LOG_DIR: './experiments/models/mixup/yolo_v2_darknet_19_voc'
-RESUME_CHECKPOINT: './experiments/pre_test/darknet19_yolo_v2_voc_78.4.pth'
+#EXP_DIR: './experiments/models/mixup/wr/yoloswish_v2_darknet_19_voc/200s'
+#LOG_DIR: './experiments/models/mixup/wr/yoloswish_v2_darknet_19_voc/200s'
+#RESUME_CHECKPOINT: './experiments/pre_test/darknet19_yolo_v2_voc_78.4.pth'
+EXP_DIR: './experiments/models/mixup/wr/yoloswish_v2_darknet_19_voc/200s'
+LOG_DIR: './experiments/models/mixup/wr/yoloswish_v2_darknet_19_voc/200s'
+RESUME_CHECKPOINT: './experiments/models/mixup/wr/yoloswish_v2_darknet_19_voc/yolo_v2_darknet_19_swish_voc_epoch_200.pth'
+
 PHASE: ['train', 'test']
 
 TRAIN_MODE: ['mixup']
-TEST_STEP: 1000
+TEST_STEP: 500

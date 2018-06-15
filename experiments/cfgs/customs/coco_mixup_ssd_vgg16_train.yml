@@ -1,34 +1,31 @@
 MODEL:
-  SSDS: rfb
+  SSDS: ssd
   NETS: vgg16
   IMAGE_SIZE: [300, 300]
-  NUM_CLASSES: 21
-  FEATURE_LAYER: [[22, 34, 'RBF', 'RBF', '', ''], [512, 1024, 512, 256, 256, 256]]
+  NUM_CLASSES: 81
+  FEATURE_LAYER: [[22, 34, 'S', 'S', '', ''], [512, 1024, 512, 256, 256, 256]]
   STEPS: [[8, 8], [16, 16], [32, 32], [64, 64], [100, 100], [300, 300]]
   SIZES: [[30, 30], [60, 60], [111, 111], [162, 162], [213, 213], [264, 264], [315, 315]]
   ASPECT_RATIOS: [[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2], [1, 2]]
-#  ACTIVATION: 'swish'
 
 TRAIN:
-  MAX_EPOCHS: 500
+  MAX_EPOCHS: 400
   CHECKPOINTS_EPOCHS: 10
-  BATCH_SIZE: 32 #32
+  BATCH_SIZE: 32
   TRAINABLE_SCOPE: 'base,norm,extras,loc,conf'
   RESUME_SCOPE: 'base,norm,extras,loc,conf'
   OPTIMIZER:
     OPTIMIZER: sgd
-    LEARNING_RATE: 0.000017
+    LEARNING_RATE: 0.004
     MOMENTUM: 0.9
     WEIGHT_DECAY: 0.0001
   LR_SCHEDULER:
-#    SCHEDULER: WR
     SCHEDULER: SGDR
-    WARM_UP_EPOCHS: 300
-    WR_TI: 70
+    WARM_UP_EPOCHS: 5
 
 TEST:
   BATCH_SIZE: 64
-  TEST_SCOPE: [300, 500]
+  TEST_SCOPE: [290, 400]
 
 MATCHER:
   MATCHED_THRESHOLD: 0.5
@@ -41,17 +38,16 @@ POST_PROCESS:
   MAX_DETECTIONS: 100
 
 DATASET:
-  DATASET: 'voc'
-  DATASET_DIR: './data/VOC/VOCdevkit'
-  TRAIN_SETS: [['2007', 'trainval'], ['2012', 'trainval']]
-  TEST_SETS:  [['2007', 'test']]
+  DATASET: 'coco'
+  DATASET_DIR: './data/coco'
+  TRAIN_SETS: [['2014', 'train']]
+  TEST_SETS:  [['2014', 'val']]
 
-EXP_DIR: './experiments/models/mixup/rfb_vgg16_voc'
-LOG_DIR: './experiments/models/mixup/rfb_vgg16_voc'
-RESUME_CHECKPOINT: './experiments/pre_test/vgg16_rfb_voc_79.6.pth'
-PHASE: ['train', 'test']
+EXP_DIR: './experiments/models/coco/mixup/ssd_vgg16_voc'
+LOG_DIR: './experiments/models/coco/mixup/ssd_vgg16_voc'
+#RESUME_CHECKPOINT: './experiments/models/mixup/ssd_vgg16_voc/ssd_vgg16_voc_epoch_290.pth'
+RESUME_CHECKPOINT: './experiments/pre_test/vgg16_ssd_coco_24.4.pth'
+PHASE: ['train']
 
 TRAIN_MODE: ['mixup']
 TEST_STEP: 1000
-
-# From 280 Epoch, change to swish

@@ -134,6 +134,8 @@ __C.TRAIN.LR_SCHEDULER.MAX_EPOCHS = __C.TRAIN.MAX_EPOCHS - __C.TRAIN.LR_SCHEDULE
 
 ##########################
 __C.TRAIN.LR_SCHEDULER.WR_TI = 70
+__C.TRAIN.LR_SCHEDULER.WR_BETA = 0.5
+__C.TRAIN.CRITERION = 'multibox_loss'  # multibox_loss / focal_loss
 
 # ---------------------------------------------------------------------------- #
 # Test options
@@ -141,6 +143,7 @@ __C.TRAIN.LR_SCHEDULER.WR_TI = 70
 __C.TEST = AttrDict()
 __C.TEST.BATCH_SIZE = __C.TRAIN.BATCH_SIZE
 __C.TEST.TEST_SCOPE = [0, 300]
+__C.TEST.TEST_BASELINE = False
 
 
 # ---------------------------------------------------------------------------- #
@@ -154,6 +157,8 @@ __C.MATCHER.MATCHED_THRESHOLD = 0.5
 __C.MATCHER.UNMATCHED_THRESHOLD = 0.5
 __C.MATCHER.NEGPOS_RATIO = 3
 __C.MATCHER.VARIANCE = [0.1, 0.2]
+__C.MATCHER.FL_ALPHA = 1.0
+__C.MATCHER.FL_GAMMA = 2
 
 
 # ---------------------------------------------------------------------------- #

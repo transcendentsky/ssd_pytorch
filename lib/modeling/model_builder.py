@@ -42,6 +42,7 @@ networks_map = {
                     'mobilenet_v2_025': mobilenet.mobilenet_v2_025,
                     'darknet_19': darknet.darknet_19,
                     'darknet_53': darknet.darknet_53,
+                    'darknet_19_swish': darknet.darknet_19_swish,
                }
 
 from lib.layers.functions.prior_box import PriorBox

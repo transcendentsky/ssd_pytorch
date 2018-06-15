@@ -9,7 +9,7 @@ MODEL:
   ASPECT_RATIOS: [[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2], [1, 2]]
 
 TRAIN:
-  MAX_EPOCHS: 300
+  MAX_EPOCHS: 400
   CHECKPOINTS_EPOCHS: 10
   BATCH_SIZE: 32
   TRAINABLE_SCOPE: 'base,norm,extras,loc,conf'
@@ -24,6 +24,7 @@ TRAIN:
 
 TEST:
   BATCH_SIZE: 64
+  TEST_SCOPE: [290, 400]
 
 MATCHER:
   MATCHED_THRESHOLD: 0.5
@@ -44,9 +45,7 @@ DATASET:
 EXP_DIR: './experiments/models/mixup/ssd_vgg16_voc'
 LOG_DIR: './experiments/models/mixup/ssd_vgg16_voc'
 RESUME_CHECKPOINT: './experiments/pre_test/vgg16_ssd_voc_76.pth'
-PHASE: ['train']
+PHASE: ['train', 'test']
 
 TRAIN_MODE: ['mixup']
-TEST_STEP: 10
-MODEL:
-  ACTIVATION: 'swish'
+TEST_STEP: 1000

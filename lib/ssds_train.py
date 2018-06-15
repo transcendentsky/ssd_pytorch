@@ -25,6 +25,7 @@ from lib.utils.config_parse import cfg
 from lib.utils.eval_utils import *
 from lib.utils.visualize_utils import *
 
+_DEBUG = False
 
 class Solver(object):
     """
@@ -73,7 +74,13 @@ class Solver(object):
         self.max_epochs = cfg.TRAIN.MAX_EPOCHS
 
         # metric
-        self.criterion = MultiBoxLoss(cfg.MATCHER, self.priors, self.use_gpu)
+        if cfg.TRAIN.CRITERION == 'multibox_loss':
+            self.criterion = MultiBoxLoss(cfg.MATCHER, self.priors, self.use_gpu)
+        elif cfg.TRAIN.CRITERION == 'focal_loss' :
+            self.criterion = FocalLoss(cfg.MATCHER, self.priors, self.use_gpu)
+        else:
+            raise ValueError('Error: No Criterion Setting !, Set ? : {}'.format(cfg.TRAIN.CRITERION))
+
 
         # Set the logger
         self.writer = SummaryWriter(log_dir=cfg.LOG_DIR)
@@ -192,6 +199,8 @@ class Solver(object):
         if self.checkpoint:
             print('Loading initial model weights from {:s}'.format(self.checkpoint))
             self.resume_checkpoint(self.checkpoint)
+        else:
+            print("Training from scratch. Any Initializer? ")
 
         start_epoch = 0
         return start_epoch
@@ -272,16 +281,19 @@ class Solver(object):
                         self.visualize_epoch(self.model, self.visualize_loader, self.priorbox, self.writer, epoch,
                                              self.use_gpu)
         else:
+            print("No Previous Checkpoints......")
+        if cfg.TEST.TEST_BASELINE:
             sys.stdout.write('\rCheckpoint {}:\n'.format(self.checkpoint))
             self.resume_checkpoint(self.checkpoint)
             if 'eval' in cfg.PHASE:
                 self.eval_epoch(self.model, self.eval_loader, self.detector, self.criterion, self.writer, 0,
-                                        self.use_gpu)
+                                self.use_gpu)
             if 'test' in cfg.PHASE:
                 self.test_epoch(self.model, self.test_loader, self.detector, self.output_dir, self.writer,
-                                        0, self.use_gpu)
+                                1, self.use_gpu)
             if 'visualize' in cfg.PHASE:
                 self.visualize_epoch(self.model, self.visualize_loader, self.priorbox, self.writer, 0, self.use_gpu)
+
 
     def train_epoch(self, model, data_loader, optimizer, criterion, writer, epoch, use_gpu):
         model.train()
@@ -327,11 +339,10 @@ class Solver(object):
             conf_loss += loss_c.data[0]
 
             # log per iter
-            log = '\r==>Train: || {iters:d}/{epoch_size:d} in {time:.3f}s [{prograss}] || loc_loss: {loc_loss:.4f} cls_loss: {cls_loss:.4f}\r'.format(
-                prograss='#' * int(round(10 * iteration / epoch_size)) + '-' * int(
-                    round(10 * (1 - iteration / epoch_size))), iters=iteration, epoch_size=epoch_size,
-                time=time, loc_loss=loss_l.data[0], cls_loss=loss_c.data[0])
-            print(log, end='')
+            log = '\r==>Train: || {iters:d}/{epoch_size:d} in {time:.3f}s [{prograss}] || loc_loss: {loc_loss:.4f} cls_loss: {cls_loss:.4f} || lr = {lr:lf}\r'.format(
+                prograss='#', iters=iteration, epoch_size=epoch_size,
+                time=time, loc_loss=loss_l.data[0], cls_loss=loss_c.data[0], lr=optimizer.param_groups[0]['lr'])
+            print(log, end=' ')
             # sys.stdout.write(log)
             # sys.stdout.flush()
 
@@ -365,6 +376,11 @@ class Solver(object):
 
         for iteration in iter(range((epoch_size))):
             images, targets = next(batch_iterator)
+            if _DEBUG:
+                print(images.size())
+                print(len(targets))
+                print(targets[0].size())
+                exit(0)
             lam = np.random.beta(alpha, alpha)
             ##  mixup
             index = np.arange(len(targets))
@@ -409,12 +425,17 @@ class Solver(object):
             conf_loss += loss_c.data[0]
 
             # log per iter
-            log = '\r==>Train: || {iters:d}/{epoch_size:d} in {time:.3f}s [{prograss}] || loc_loss: {loc_loss:.4f} cls_loss: {cls_loss:.4f}\r'.format(
+            log = '\r==>Train: || {iters:d}/{epoch_size:d} in {time:.3f}s [{prograss}] || loc_loss: {loc_loss:.4f} cls_loss: {cls_loss:.4f} || lr = {lr:f}\r'.format(
                 prograss='#', iters=iteration, epoch_size=epoch_size,
-                time=time, loc_loss=loss_l.data[0], cls_loss=loss_c.data[0])
+                time=time, loc_loss=loss_l.data[0], cls_loss=loss_c.data[0], lr=optimizer.param_groups[0]['lr'])
             print(log, end=' ')
             # sys.stdout.write(log)
             # sys.stdout.flush()
+            if _DEBUG:
+                print("\n\n???????????????\n\n")
+                print(loss_l.size())
+                print(loss_c.size())
+                exit(0)
 
         # log per epoch
         sys.stdout.write('\r')
@@ -581,6 +602,8 @@ class Solver(object):
 
         _t = Timer()
 
+        # _DEBUG = True
+
         for i in iter(range((num_images))):
             img = dataset.pull_image(i)
             scale = [img.shape[1], img.shape[0], img.shape[1], img.shape[0]]
@@ -707,8 +730,13 @@ class Solver(object):
                 from utils.warm_restart import WarmRestart
             except:
                 raise ImportError("Failed to import Warm_restart....")
-            scheduler = WarmRestart(optimizer, ti=cfg.WR_TI)
-
+            scheduler = WarmRestart(optimizer, ti=cfg.WR_TI, beta=cfg.WR_BETA)
+        elif cfg.SCHEDULER == 'FIXED':
+            try:
+                from utils.warm_restart import WarmRestart
+            except:
+                raise ImportError("Failed to import Warm_restart....")
+            scheduler = WarmRestart(optimizer, fixed=True)
         else:
             AssertionError('scheduler can not be recognized.')
         return scheduler

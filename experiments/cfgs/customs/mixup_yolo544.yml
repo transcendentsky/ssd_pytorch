@@ -1,33 +1,32 @@
 MODEL:
   SSDS: yolo_v2
   NETS: darknet_19
-  IMAGE_SIZE: [416, 416]
+  IMAGE_SIZE: [544, 544]
   NUM_CLASSES: 21
   FEATURE_LAYER: [[['', '',12, '']], [[1024, 1024, 64, 1024]]]
-  SIZES: [[416, 416]]
+  SIZES: [[544, 544]]
   ASPECT_RATIOS: [[[0.1,0.1], [0.2,0.2], [0.3,0.3], [0.5,0.5], [0.9,0.9]]]
 
 TRAIN:
-  MAX_EPOCHS: 500
+  MAX_EPOCHS: 300
   CHECKPOINTS_EPOCHS: 10
-  BATCH_SIZE: 128 # 32
+  BATCH_SIZE: 32
   TRAINABLE_SCOPE: 'base,extras,loc,conf'
   RESUME_SCOPE: 'base,extras,loc,conf'
   OPTIMIZER:
     OPTIMIZER: sgd
-    LEARNING_RATE: 0.000018
+    LEARNING_RATE: 0.0012
     MOMENTUM: 0.9
-#    MOMENTUM: 0
     WEIGHT_DECAY: 0.0001
   LR_SCHEDULER:
-#    SCHEDULER: SGDR
-    SCHEDULER: WR
-    WARM_UP_EPOCHS: 0
-    WR_TI: 70
+    SCHEDULER: SGDR
+    WARM_UP_EPOCHS: 120
+#    ####  warm_restart ti  ####
+#    WR_TI: 70
 
 TEST:
   BATCH_SIZE: 64
-  TEST_SCOPE: [301, 301]
+  TEST_SCOPE: [90, 300]
 
 MATCHER:
   MATCHED_THRESHOLD: 0.5
@@ -46,10 +45,10 @@ DATASET:
   TEST_SETS:  [['2007', 'test']]
   PROB: 0.6
 
-EXP_DIR: './experiments/models/mixup/yolo_v2_darknet_19_voc'
-LOG_DIR: './experiments/models/mixup/yolo_v2_darknet_19_voc'
+EXP_DIR: './experiments/models/mixup/yolo544'
+LOG_DIR: './experiments/models/mixup/yolo544'
 RESUME_CHECKPOINT: './experiments/pre_test/darknet19_yolo_v2_voc_78.4.pth'
-PHASE: ['train', 'test']
+PHASE: ['train','test']
 
 TRAIN_MODE: ['mixup']
 TEST_STEP: 1000
